@@ -1,0 +1,55 @@
+﻿
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>_Layout</title>
+    <link href="~/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/lib/fontawesome/css/all.css" rel="stylesheet" />
+</head>
+<body>
+    <!-- Link verirken MVC de controllerName/actionName yöntemini kullandık -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Navbar</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Student" asp-action="Index">Öğrenci Listesi</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Student" asp-action="Create">Öğrenci Kayıt</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Teacher" asp-action="Index">Öğretmen Listesi</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Teacher" asp-action="Create">Öğretmen Kayıt</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Course" asp-action="Index">Kurs Listele</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Course" asp-action="Create">Kurs Oluştur</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        @RenderBody()
+        <!--RenderBody methodu ile sayfadan sayfaya değişecek olan    yeri işaretliyoruz-->
+    </main>
+
+
+    <footer style="bottom:0; padding:5px; background-color:aquamarine;width:100%;border-top:1px solid black; text-align:center">
+        Alt Bilgi
+    </footer>
+
+</body>
+</html>

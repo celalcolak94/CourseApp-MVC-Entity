@@ -1,0 +1,29 @@
+﻿@{
+    ViewData["Title"] = "Create";
+}
+
+@model Teacher
+
+<form class="container mt-3" method="post" asp-controller="Teacher" asp-action="Create">
+    <div class="mb-3">
+        <label class="form-label">Ad</label>
+        <input asp-for="Name" type="text" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Soyad</label>
+        <input asp-for="SurName" type="text" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Telefon Numarası</label>
+        <input asp-for="PhoneNumber" type="text" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Sicil No</label>
+        <input asp-for="SicilNumber" type="text" class="form-control">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+</form>

@@ -1,0 +1,33 @@
+﻿@using MVCApp.Models
+@model List<ProductModel>
+<!-- @@model declaration ile view gönderilen modele bağlanıyor-->
+@{
+    ViewData["Title"] = "Index";
+}
+
+@{
+    string isim = "Ali";
+    int sayi1 = 10;
+    int sayi2 = 15;
+}
+
+<h1>Index</h1>
+
+<p>@isim</p>
+
+<p>Çarpım : @(sayi1 * sayi2)</p>
+
+
+
+<!-- View gönderilen her şey model olarak yakalanır -->
+
+<div>
+    @foreach (var item in Model)
+    {
+        <div>Ürün Adı : @item.İsim</div>
+        <div>Ürün Fiyatı : @item.Fiyat</div>
+        <div>Ürün Stoğu : @item.Stok</div>
+        <div>Kategorisi : @item.Kategori</div>
+        <br />
+    }
+</div>
