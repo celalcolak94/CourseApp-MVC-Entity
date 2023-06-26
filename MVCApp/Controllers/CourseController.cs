@@ -1,67 +1,68 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using MVCApp.Data;
 using MVCApp.Models;
 using MVCAppIntro.Data;
 
-namespace MVCApp.Controllers
+namespace MVCAppIntro.Controllers
 {
     public class CourseController : Controller
     {
         public IActionResult Index(int sayfa = 1, string aranan = "", string fiyatSiralama = "asc")
         {
-            var db = new TestDbContext();
-
-            //Course çekilirken CourseTeacher bilgisini de çek      yani joinle
-            //Eğet CourseTeacherId null değilse kayıt gelir
-            var courses = db.Courses.Include(x => x.CourseTeacher)
-                .Where(x => x.StartDate.Value > DateTime.Now.Date)   //Henüz başlamamış kursları getir.
-                .Where(x => EF.Functions.Like(x.Name, "%" + aranan + "%"))
-                .OrderBy(x => x.StartDate).ToList(); //başlangıç saatine göre sırala
+            var db = new TestDbContext(); // sınıfa bağlan.
+                                          // course çekilirken CourseTeacher bilgisinide çek yani joinle
+                                          // eğer CourseTeacherId null değilse kayıt gelir.
+                                          // sayfalama yapmadan önce sıralama yaparız.
+            var clist = db.Courses.Include(x => x.CourseTeacher).Include(x => x.CourseStudents)
+              .Where(x => x.StartDate.Value > DateTime.Now.Date) // henüz başlamış kursları getir.
+              .Where(x => EF.Functions.Like(x.Name, "%" + aranan + "%"))
+              .OrderBy(x => x.StartDate).ToList(); // başlangıç saatine göre sırala
 
 
 
             if (fiyatSiralama == "asc")
             {
-                courses = courses.OrderBy(x => x.Price).ToList();
+                clist = clist.OrderBy(x => x.Price).ToList(); // select Name,SurName from Students.ToList();
             }
             else if (fiyatSiralama == "desc")
             {
-                courses = courses.OrderByDescending(x => x.Price).ToList();
+                clist = clist.OrderByDescending(x => x.Price).ToList();
             }
 
 
-            //Sıraladıktan sonra tekrar sıralamaya göre sayfalansın diye kodu buraya aldık.
-            //Sıralamaya göre sayfalama doğru çalışsın diye yaptık
+            // sıralandıktan sonra tekrar sıralamaya göre sayfalansın diye kodu buraya aldık.
+            // sıralamaya göre sayfalama doğru çalışsın diye yaptık.
+            clist = clist.Skip((sayfa - 1) * 5) // kayıt atlatma
+              .Take(5) // kayıt alma
+              .ToList();
 
-            courses = courses.Skip((sayfa - 1) * 5) //kayıt atlatma
-                .Take(5) //kayıt alma
-                .ToList();
 
+            // sayfa sayısı hesaplama algoritması
 
-            //Sayfa sayısını hesaplama algoritması
-
-            //Select Count(*) form Courses db.Courses.Count()
-            //Her sayfada 5 adet kayıt görüneceği için kayıt sayısını 5 böldük ve sayfa sayısını bulduk
+            // select Count(*) from Courses db.Courses.Count()
+            // her sayfada 5 adet kayıt görüneceği için kayıt sayısını 5 böldük. ve sayfa sayısını bulduk
             double kayitSayisi = Convert.ToDouble(db.Courses
-                .Where(x => x.StartDate.Value > DateTime.Now.Date)
-                .Where(x => EF.Functions.Like(x.Name, "%" + aranan + "%"))
-                .Count());
-            double sayfaSayisi = Convert.ToInt32(Math.Ceiling(kayitSayisi / 5)); //Yukarı yuvarla
-            //11/5 = 2.1 => 3e yuvarlamamız lazım
-            //Sayfa sayısıda tam sayı olacağı convert.toint ile sayfa sayısını int  tamsayı yaptık
+              .Where(x => x.StartDate.Value > DateTime.Now.Date)
+              .Where(x => EF.Functions.Like(x.Name, "%" + aranan + "%"))
+              .Count());
+            int sayfaSayisi = Convert.ToInt32(Math.Ceiling(kayitSayisi / 5)); // 11/5 2.1 => 3 yuvarlamamız lazım.olacağı için Convert.ToInt32 ile sayfa sayısını int tamsayı yaptık.
+                                                                              // yukarı yuvarlama Ceiling
 
-            ViewBag.SayfaSayisi = sayfaSayisi;
-            ViewBag.OncekiSayfa = sayfa == 1 ? 1 : sayfa - 1; // sayfa 1 ise zaten önceki sayfa olmaz
-            ViewBag.SonrakiSayfa = sayfa == sayfaSayisi ? sayfaSayisi : sayfa + 1;
-            //Son sayfadaysam zaten sayfa sondur, değilsem sonraki sayfa şuanki sayfa + 1 olur
+            ViewBag.SayfaSayisi = sayfaSayisi; // View'e göndeririz.
+            ViewBag.OncekiSayfa = sayfa == 1 ? 1 : sayfa - 1; // sayfa 1 ise zaten önceki sayfam olamaz.
+            ViewBag.SonrakiSayfa = sayfa == sayfaSayisi ? sayfaSayisi : sayfa + 1; // son sayfadaysam zaten sayfa sondur, değilsem sonraki sayfa suanki sayfa + 1 olur.
             ViewBag.Aranan = aranan;
-            ViewBag.Sayfa = sayfa;
-            ViewBag.FiyatSiralama = fiyatSiralama;
 
-            return View(courses);
+            // Sıralama işleminde son sayfa ve fiyatSıralama seçimi elimizde kalsın diye ViewBag yaptık.
+            ViewBag.Sayfa = sayfa;
+            ViewBag.fiyatSiralama = fiyatSiralama;
+
+
+
+            return View(clist);
         }
+
 
         [HttpGet]
         public IActionResult Create()
@@ -69,28 +70,32 @@ namespace MVCApp.Controllers
             return View();
         }
 
+
         [HttpPost]
         public IActionResult Create(Course course)
         {
-            //Kodun veri tabanına gitmeden önce kontrolden geçmesi olayına validasyon denir.
+            // kodun veri tabanına gitmeden önce kontrolden geçmesine olayına validasyon diyoruz.
+
+
 
             if (course.StartDate > course.EndDate)
             {
-                ModelState.AddModelError("StartDate", "Başlangıç tarihi bitiş tarihinden büyük olamaz.");
+                ModelState.AddModelError("StartDate", "Başlangıç tarihi biriş tarihinden büyük olmaz");
             }
 
 
-            //Validasyondan geçtiysek(kontrol)
+            // Validasyondan geçtiysek
             if (ModelState.IsValid)
             {
                 var db = new TestDbContext();
                 db.Courses.Add(course);
                 db.SaveChanges();
 
-                ModelState.Clear();
+                ModelState.Clear(); // Formu boşaltırız.
 
                 ViewBag.message = "Kayıt Başarılı";
             }
+
 
             return View();
         }
@@ -99,36 +104,80 @@ namespace MVCApp.Controllers
         public IActionResult AssingTeacherToCourse(int id)
         {
             var db = new TestDbContext();
-            ViewBag.Teachers = db.Teachers.ToList();  //Öğretmenler Listesi
-            ViewBag.Courses = db.Courses.ToList();  //Kurslar Listesi
+            var course = db.Courses.Find(id);
 
-            var c = db.Courses.Find(id);
-            ViewBag.Course = c.Name;
+            ViewBag.Course = course.Name;
+            ViewBag.Teachers = db.Teachers.ToList(); // öğretmenler listesi
+            ViewBag.Courses = db.Courses.ToList(); // kurslar listesi
 
             return View();
         }
 
-        //Bazı durumlarda ekran databasedeki modeller için yetersiz kalır. Fazladan databasedeki modellerin alanlarını formdan göndermek yerine sadece formdan gönderilecek olan alanları belirleyip model klasörü içerisine tanımlarız.
+        // Bazı durumlarda ekran databasedeki modeller için yetersiz kalır. Fazladan Databasedeki modellerin alanlarını formdan göndermek yerine sadece formdan gönderilecek olan alanları berlirleyi model klasörü içerisinde tanımlarız.
+
         [HttpPost]
         public IActionResult AssingTeacherToCourse(CourseTeacher courseTeacher)
         {
             var db = new TestDbContext();
-            ViewBag.Teachers = db.Teachers.ToList();  //Öğretmenler Listesi
-            ViewBag.Courses = db.Courses.ToList();  //Kurslar Listesi
+            ViewBag.Teachers = db.Teachers.ToList(); // öğretmenler listesi
+            ViewBag.Courses = db.Courses.ToList();
+            //// sayfa post edilince 2 kişi için bir güncelleme yapıalcak ise burası tekrar doldurulur.
 
             if (ModelState.IsValid)
             {
+
                 var c = db.Courses.FirstOrDefault(x => x.Name == courseTeacher.CourseName);
                 c.CourseTeacherId = courseTeacher.TeacherId;
+
                 db.Courses.Update(c);
                 db.SaveChanges();
 
-                ModelState.Clear();
-
-                ViewBag.message = "Kayıt Başarılı";
+                ViewBag.message = "Kayıt başarılı.";
             }
+
 
             return View();
         }
+
+
+        // course/addStudent?courseId=1
+        [HttpGet]
+        public IActionResult AddStudent(int courseId)
+        {
+            var db = new TestDbContext();
+            // Include varsa Find kullanamıyoruz. Onun yerine FirstOrDefault kullanıyoruz.
+            var course = db.Courses.Include(x => x.CourseTeacher)
+              .Include(x => x.CourseStudents).FirstOrDefault(x => x.Id == courseId);
+
+            ViewBag.Students = db.Students.ToList(); // Öğrenciler Dropdown doldurmak için kullandık
+
+            return View(course);
+        }
+
+        [HttpPost]
+        public IActionResult AddStudent(int[] studentIds, int courseId)
+        {
+
+            var db = new TestDbContext();
+            var course = db.Courses.Find(courseId);
+
+            ViewBag.Students = db.Students.ToList();
+
+            var students = db.Students.Where(x => studentIds.Contains(x.Id)).ToList();
+            // select * from students where StudentId in (1,2,3)
+            //course.CourseStudents = new List<Student>();
+
+            course.CourseStudents.AddRange(students); // çoklu öğrenci atama kodu.
+            db.SaveChanges();
+
+
+            return RedirectToAction("Index", "Course");
+        }
+
+
+        // TeacherId
+        // CourseId
+
+
     }
 }

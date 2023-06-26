@@ -41,7 +41,8 @@ namespace MVCApp.Data
 
         public int? CourseTeacherId { get; set; } //int? diyerek boş geçilebilir bir foreign key tanımı yapıyoruz. Daha sonradan öğretmen atanabilir diye.
         public Teacher? CourseTeacher { get; set; } //Kursun eğitmeni
-        public List<Student>? CourseStudents { get; set; } //Kursa katılan öğrenciler
+        public List<Student>? CourseStudents { get; set; } = new List<Student>();
+        //Kursa katılan öğrenciler
 
     }
 }

@@ -14,5 +14,5 @@ app.UseRouting(); // uygulama da yönlendirme iþlemleri çalýþsýn.
 // uygulama ilk açýldýðýnda anasayfadan açýlmasý için aþaðýdaki kuralý yazdýk.
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}"); // uygulamadan gelen istekler controllera yönlendirilsin ayarý yaptýk.
+    pattern: "{controller=Course}/{action=Index}/{id?}"); // uygulamadan gelen istekler controllera yönlendirilsin ayarý yaptýk.
 app.Run();
