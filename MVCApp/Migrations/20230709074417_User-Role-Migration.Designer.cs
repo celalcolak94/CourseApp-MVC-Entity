@@ -4,6 +4,7 @@ using MVCAppIntro.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MVCApp.Migrations
 {
     [DbContext(typeof(TestDbContext))]
-    partial class TestDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230709074417_User-Role-Migration")]
+    partial class UserRoleMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -90,10 +92,14 @@ namespace MVCApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
+                    b.HasIndex("Name");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Roles");
                 });
@@ -164,20 +170,24 @@ namespace MVCApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasMaxLength(12)
-                        .HasColumnType("nvarchar(12)");
+                        .HasColumnType("nvarchar(12)")
+                        .HasColumnName("KullanıcıAdı");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Email")
-                        .IsUnique();
+                    b.HasIndex("Email");
 
-                    b.HasIndex("UserName")
-                        .IsUnique();
+                    b.HasIndex("RoleId");
 
-                    b.ToTable("Users");
+                    b.HasIndex("UserName");
+
+                    b.ToTable("Kullanıcılar", (string)null);
                 });
 
             modelBuilder.Entity("RoleUser", b =>
@@ -217,6 +227,20 @@ namespace MVCApp.Migrations
                         .HasForeignKey("CourseTeacherId");
 
                     b.Navigation("CourseTeacher");
+                });
+
+            modelBuilder.Entity("MVCApp.Data.Role", b =>
+                {
+                    b.HasOne("MVCApp.Data.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("MVCApp.Data.User", b =>
+                {
+                    b.HasOne("MVCApp.Data.Role", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId");
                 });
 
             modelBuilder.Entity("RoleUser", b =>

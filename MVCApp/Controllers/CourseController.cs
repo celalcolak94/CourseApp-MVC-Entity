@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MVCApp.Data;
 using MVCApp.Models;
@@ -6,6 +7,7 @@ using MVCAppIntro.Data;
 
 namespace MVCAppIntro.Controllers
 {
+    [Authorize(AuthenticationSchemes = "YZL3439")] //Sadece login olanlar girebilir. Oturum açılmazsa login sayfasına   yönlendirir.
     public class CourseController : Controller
     {
         public IActionResult Index(int sayfa = 1, string aranan = "", string fiyatSiralama = "asc")
@@ -65,6 +67,7 @@ namespace MVCAppIntro.Controllers
 
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
@@ -72,6 +75,7 @@ namespace MVCAppIntro.Controllers
 
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create(Course course)
         {
             // kodun veri tabanına gitmeden önce kontrolden geçmesine olayına validasyon diyoruz.

@@ -1,0 +1,20 @@
+﻿@{
+    ViewData["Title"] = "Index";
+}
+
+
+@if(User.Identity.IsAuthenticated)
+{
+   <p>Hoş geldiniz @User?.Identity?.Name</p>
+}
+
+
+@if (User.IsInRole("Admin"))
+{
+    <p>Sadece Admin Rolü görebilir.</p>
+}
+
+@if (User.IsInRole("Manager"))
+{
+    <p>Sadece Manager Rolü görebilir.</p>
+}

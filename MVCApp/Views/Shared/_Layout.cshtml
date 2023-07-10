@@ -12,7 +12,7 @@
     <!-- Link verirken MVC de controllerName/actionName yöntemini kullandık -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
-            <a class="navbar-brand">Admin Paneli</a>
+            <a asp-controller="Home" asp-action="Index" class="navbar-brand">Admin Paneli</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -38,6 +38,32 @@
                     </li>
                 </ul>
             </div>
+            <div class="float-end">
+
+                <div class="btn-group dropstart">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <span>@User.Identity.Name</span>
+                        }
+                        else
+                        {
+                            <span>Misafir</span>
+                        }
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li><a class="dropdown-item" asp-controller="Account" asp-action="LogOut">Oturum Kapat</a></li>
+                        }
+                        else
+                        {
+                            <li><a class="dropdown-item" asp-controller="Account" asp-action="Login">Oturum Aç</a></li>
+                        }
+                    </ul>
+                </div>
+
+            </div>
         </div>
     </nav>
 
@@ -50,6 +76,8 @@
     <footer style="bottom:0; padding:5px; background-color:aquamarine;width:100%;border-top:1px solid black; text-align:center">
         Alt Bilgi
     </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
 </body>
 </html>
